@@ -2,7 +2,7 @@ const { Telegraf } = require('telegraf');
 
 // Bot Token နဲ့ Owner IDs (မင်း ID တွေ)
 const bot = new Telegraf('8626207401:AAG7zf9ZwRgUQUrAcD8zvQNVVz4J_awsyBk');
-const OWNERS = [8258869818, 8626207401]; 
+const OWNERS = [8258869818]; 
 
 bot.on('message', async (ctx) => {
     if (!ctx.message) return;
