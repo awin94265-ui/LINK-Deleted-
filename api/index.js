@@ -10,7 +10,6 @@ bot.on(['message', 'edited_message'], async (ctx) => {
     const text = (msg.text || msg.caption || "").toLowerCase();
     const entities = msg.entities || msg.caption_entities || [];
 
-    // ပိုမိုတိကျသော Link စစ်ဆေးခြင်း
     const hasLink = entities.some(e => ['url', 'text_link', 'mention'].includes(e.type));
     const badPatterns = ["t.me/", "http", "www.", ".com", ".net", ".org", "share", "@"];
     const containsBad = badPatterns.some(word => text.includes(word));
@@ -19,7 +18,7 @@ bot.on(['message', 'edited_message'], async (ctx) => {
         try {
             await ctx.deleteMessage();
             await ctx.banChatMember(ctx.from.id);
-            const warn = await ctx.reply(`🚫 Link/Mention ချလို့ @${ctx.from.username || ctx.from.first_name} ကို အပြီးဘန်းလိုက်ပြီ!`);
+            const warn = await ctx.reply(`🚫 Link Terminator: @${ctx.from.username || ctx.from.first_name} ကို အပြီးဘန်းလိုက်ပြီ!`);
             setTimeout(() => ctx.deleteMessage(warn.message_id).catch(() => {}), 3000);
         } catch (e) {
             console.log("Ban error:", e.message);
@@ -27,11 +26,16 @@ bot.on(['message', 'edited_message'], async (ctx) => {
     }
 });
 
+// Vercel Entry Point
 module.exports = async (req, res) => {
     if (req.method === 'POST') {
-        await bot.handleUpdate(req.body);
-        res.status(200).send('OK');
+        try {
+            await bot.handleUpdate(req.body);
+            res.status(200).send('OK');
+        } catch (e) {
+            res.status(500).send('Internal Error');
+        }
     } else {
-        res.status(200).send('Bot Status: Online and Ready!');
+        res.status(200).send('Bot Status: Active and Protecting! 🛡️');
     }
 };
