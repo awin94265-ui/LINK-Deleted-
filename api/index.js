@@ -18,7 +18,7 @@ bot.command('addgp', async (ctx) => {
 bot.on('new_chat_members', async (ctx) => {
     if (!ALLOWED_GROUPS.includes(ctx.chat.id)) return;
     for (const member of ctx.message.new_chat_members) {
-        const welcomeMsg = `🌿 ${ctx.chat.title} မိသားစုမှ နွေးထွေးစွာကြိုဆိုပါတယ်ရှင့် ${member.first_name} ပါရှင့် 🌿\n\nGroup အတွင်း Link ချခြင်းနှင့် Forward ပို့ခြင်း လုံးဝမပြုလုပ်ရပါရှင့်။`;
+        const welcomeMsg = `🌿 ${ctx.chat.title} မိသားစုမှ နွေးထွေးစွာကြိုဆိုပါတယ်ရှင့် ${member.first_name} မဂ်လာပါရှင့် 🌿\n\nGroup အတွင်း Link ချခြင်းနှင့် Forward ပို့ခြင်း လုံးဝမပြုလုပ်ရပါရှင့်။`;
         try {
             await ctx.replyWithPhoto('https://raw.githubusercontent.com/awin94265-ui/LINK-Deleted-/main/1000030711.png', { caption: welcomeMsg });
         } catch (e) { await ctx.reply(welcomeMsg); }
