@@ -25,16 +25,19 @@ bot.on('new_chat_members', async (ctx) => {
     }
 });
 
-// ၂။ Link & Forward Terminator
+// ၂။ Link & Forward Terminator (Channel ချွင်းချက်ပါဝင်သည်)
 bot.on(['message', 'edited_message'], async (ctx) => {
-    if (!ctx.from || !ctx.chat) return;
+    if (!ctx.chat) return;
     const chatId = ctx.chat.id;
-    const userId = ctx.from.id;
-
-    if (!ALLOWED_GROUPS.includes(chatId) || userId === OWNER_ID) return;
+    
+    // မင်းခွင့်ပြုထားတဲ့ Group မဟုတ်ရင် ဘာမှမလုပ်ဘူး
+    if (!ALLOWED_GROUPS.includes(chatId)) return;
 
     const msg = ctx.message || ctx.edited_message;
-    
+
+    // --- Channel ကလာတဲ့စာဆိုရင် (သို့) မင်းပို့တဲ့စာဆိုရင် ဘာမှမလုပ်ဘဲ ကျော်သွားမယ် ---
+    if (msg.is_automatic_forward || (ctx.from && ctx.from.id === OWNER_ID)) return;
+
     // --- Forward စစ်ဆေးခြင်း ---
     const isForwarded = msg.forward_from || msg.forward_from_chat || msg.forward_sender_name;
     
@@ -47,8 +50,9 @@ bot.on(['message', 'edited_message'], async (ctx) => {
 
     if (isForwarded || hasLink || containsBad) {
         try {
-            await ctx.deleteMessage(); // Forward သို့မဟုတ် Link ဆိုရင် ချက်ချင်းဖျက်မယ်
+            await ctx.deleteMessage();
             
+            const userId = ctx.from.id;
             if (!violationMap[userId]) violationMap[userId] = 0;
             violationMap[userId]++;
 
@@ -66,10 +70,10 @@ bot.on(['message', 'edited_message'], async (ctx) => {
             } 
             else {
                 await ctx.banChatMember(userId);
-                await ctx.reply(`🚫 ${ctx.from.first_name} ကို စည်းကမ်း ၃ ကြိမ်ဖောက်ဖျက်မှုဖြင့် အပြီးအပိုင် Ban လိုက်ပြီ!`);
+                await ctx.reply(`🚫 ${ctx.from.first_name} ကို စည်းကမ်း ၃ ကြိမ်ဖောက်ဖျက်မှုဖြင့် အပြီးအပိုင် Ban လိုက်ပါပြီ!`);
                 delete violationMap[userId];
             }
-        } catch (e) { console.log(e.message); }
+        } catch (e) { console.log("Error:", e.message); }
     }
 });
 
@@ -77,5 +81,5 @@ module.exports = async (req, res) => {
     if (req.method === 'POST') {
         await bot.handleUpdate(req.body);
         res.status(200).send('OK');
-    } else { res.status(200).send('Bot is Protecting (Anti-Forward Mode)! 🛡️'); }
+    } else { res.status(200).send('Bot is Protecting! (Channel Safe Mode)'); }
 };
